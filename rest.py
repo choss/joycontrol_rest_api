@@ -1,8 +1,10 @@
 import uvicorn
-from enum import Enum
 from fastapi import FastAPI, Path
 from pydantic import BaseModel, Field
 from starlette.responses import RedirectResponse
+from rest_controller_service import ControllerAxis
+from rest_controller_service import ControllerButton
+from rest_controller_service import ControllerStick
 
 app = FastAPI()
 
@@ -16,36 +18,6 @@ class ConnectRequest(BaseModel):
 
 class NfcData(BaseModel):
     nfc_data: str = Field(None, title="NFC data - base64 encoded", example="")
-
-class ControllerStick(str, Enum):
-    l_stick = "l_stick"
-    r_stick = "r_stick"
-
-class ControllerAxis(str, Enum):
-    x_axis = "x_axis"
-    y_axis = "y_axis"
-
-class ControllerButton(str, Enum):
-    y = 'y'
-    x = 'x'
-    b = 'b'
-    a = 'a'
-    r = 'r'
-    zr = 'zr'
-    minus = 'minus'
-    plus = 'plus'
-    r_stick = 'r_stick'
-    l_stick = 'l_stick'
-    home = 'home'
-    capture = 'capture'
-    down = 'down'
-    up = 'up'
-    right = 'right'
-    left = 'left'
-    l = 'l'
-    zl = 'zl'
-    sr = 'sr'
-    sl = 'sl'
 
 @app.get("/")
 async def redirect_to_documentation():
