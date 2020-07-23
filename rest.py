@@ -1,8 +1,11 @@
 import uvicorn
+import asyncio
+import base64
+import logging
 from fastapi import FastAPI, Path
 from pydantic import BaseModel, Field
 from starlette.responses import RedirectResponse
-from rest_controller_service import ControllerAxis
+from rest_controller_service import ControllerAxis, SwitchControllerService
 from rest_controller_service import ControllerButton
 from rest_controller_service import ControllerStick
 
@@ -10,10 +13,9 @@ app = FastAPI()
 
 
 class ConnectRequest(BaseModel):
-    spi_firm: str = Field(None, title="Controller SPI Firm - base64 encoded", example="")
-    reconnect: bool = Field(..., title="Reconnect to already paired switch", example=False)
-    reconnect_address: str = Field(None, title="MAC Address of switch", example="E1:3F:54:0B:DE:BB")
     controller_type: str = Field("PRO_CONTROLLER", title="Type of controller to emulate [PRO_CONTROLLER, JOYCON_R, JOYCON_L]", example="PRO_CONTROLLER")
+    spi_firm: str = Field(None, title="Controller SPI Firm - base64 encoded", example="")
+    reconnect_address: str = Field(None, title="MAC Address of switch - if empty a new pairing attempt will be done", example="E1:3F:54:0B:DE:BB")
 
 
 class NfcData(BaseModel):
@@ -23,41 +25,66 @@ class NfcData(BaseModel):
 async def redirect_to_documentation():
     return RedirectResponse(url='/docs')
 
+@app.post("/controller/connect")
+async def connect_to_switch(cr: ConnectRequest):
+    if cr.spi_firm is not None:
+        spi_firm_bytes = base64.b64decode(cr.spi_firm)
+    else:
+        spi_firm_bytes = None
+
+    connect_address = await app.state.switch_controller.connect(cr.controller_type, cr.reconnect_address, spi_firm_bytes)
+    return connect_address
+
+@app.get("/controller/disconnect")
+async def disconnect_from_switch():
+    await app.state.switch_controller.disconnect()
+    return await controller_status()
+
 @app.get("/controller/status")
 async def controller_status():
-    return dict()
+    return await app.state.switch_controller.get_status()
+
+@app.patch("/controller/button/tap/{button_name}")
+async def press_controller_button_for_100_ms(button_name: ControllerButton):
+    await app.state.switch_controller.press_controller_button(button_name)
+    await asyncio.sleep(0.1)
+    await app.state.switch_controller.release_controller_button(button_name)
+    return await controller_status()
 
 @app.patch("/controller/button/press/{button_name}")
 async def press_controller_button(button_name: ControllerButton):
-    return button_name
+    await app.state.switch_controller.press_controller_button(button_name)
+    return await controller_status()
 
 @app.patch("/controller/button/release/{button_name}")
 async def release_controller_button(button_name: ControllerButton):
-    return button_name
+    await app.state.switch_controller.release_controller_button(button_name)
+    return await controller_status()
 
 @app.patch("/controller/stick/{stick}/{axis}/{value}")
 async def set_stick_axis_state(stick: ControllerStick, axis: ControllerAxis, value: int = Path(..., ge=0, le=4095)):
-    return {"stick": stick, "axis": axis, "value": value}
+    await app.state.switch_controller.set_stick_axis(stick, axis, value)
+    return await controller_status()
 
 @app.patch("/controller/stick/{stick}/center")
 async def center_stick(stick: ControllerStick):
-    return {"stick": stick }
-
-@app.post("/controller/connect")
-async def connect_to_switch(cr: ConnectRequest):
-    return cr
+    await app.state.switch_controller.center_stick(stick)
+    return await controller_status()
 
 @app.post("/controller/nfc")
-async def send_nfc_data(nf: NfcData):
-    return { "result" : "OK"}
+async def send_nfc_data(nfc: NfcData):
+    nfc_data = base64.b64decode(nfc.nfc_data)
+    await app.state.switch_controller.set_nfc_data(nfc_data)
+    return await controller_status()
 
 @app.delete("/controller/nfc")
 async def remove_nfc_data():
-    return { "result" : "OK"}
+    await app.state.switch_controller.set_nfc_data(None)
+    return await controller_status()
 
 @app.on_event("startup")
 async def startup():
-    app.state.switch_controller = None
+    app.state.switch_controller = SwitchControllerService()
 
 if __name__ == "__main__":
-    uvicorn.run("rest:app", host="127.0.0.1", port=8000, log_level="info")
+    uvicorn.run("rest:app", host="0.0.0.0", port=8000, log_level="info")
