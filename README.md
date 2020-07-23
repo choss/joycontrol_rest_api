@@ -27,6 +27,7 @@ sudo python3 rest.py
 
 # Rest api notes
 
+To see the api just run the script and navigate to <ip>:8000. The documentation will be shown
 The base64 encoded data for spi firmware or nfc data should not contain line breaks. You can achieve this with the sample below.
 
 ```bash
