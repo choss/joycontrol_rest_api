@@ -1,7 +1,6 @@
 import uvicorn
 import asyncio
 import base64
-import logging
 from fastapi import FastAPI, Path
 from pydantic import BaseModel, Field
 from starlette.responses import RedirectResponse
@@ -32,8 +31,8 @@ async def connect_to_switch(cr: ConnectRequest):
     else:
         spi_firm_bytes = None
 
-    connect_address = await app.state.switch_controller.connect(cr.controller_type, cr.reconnect_address, spi_firm_bytes)
-    return connect_address
+    await app.state.switch_controller.connect(cr.controller_type, cr.reconnect_address, spi_firm_bytes)
+    return await controller_status()
 
 @app.get("/controller/disconnect")
 async def disconnect_from_switch():

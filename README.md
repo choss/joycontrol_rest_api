@@ -34,6 +34,49 @@ The base64 encoded data for spi firmware or nfc data should not contain line bre
 base64 -w 0 spi_firm.bin > spi_firm_base64.txt
 ```
 
+## responses
+
+The response of every API method is a status response like the one below.
+
+```json
+{
+  "connected": "true",
+  "peer": "AA:BB:CC:DD:EE:FF",
+  "controller_type": "PRO_CONTROLLER",
+  "buttons": {
+    "up": false,
+    "a": false,
+    "b": false,
+    "minus": false,
+    "home": false,
+    "l_stick": false,
+    "zr": false,
+    "r": false,
+    "zl": false,
+    "right": false,
+    "capture": false,
+    "r_stick": false,
+    "y": false,
+    "plus": false,
+    "left": false,
+    "x": false,
+    "l": false,
+    "down": false
+  },
+  "nfc_active": false,
+  "left_stick": {
+    "x_axis": 1987,
+    "y_axis": 1912,
+    "is_center": true
+  },
+  "right_stick": {
+    "x_axis": 2017,
+    "y_axis": 2005,
+    "is_center": true
+  }
+}
+```
+
 # Requirements for joycontrol
 
 ```bash
