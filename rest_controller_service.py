@@ -44,7 +44,7 @@ class SwitchControllerService:
         self.transport = None
 
     async def disconnect(self):
-        if self.transport is not None:
+        if self.is_connected():
             await self.transport.close()
 
         self.transport = None
@@ -68,7 +68,7 @@ class SwitchControllerService:
         return transport._itr_sock.getpeername()[0]
 
     async def get_status(self):
-        if self.transport is None:
+        if not self.is_connected():
             return {"connected" : "false"}
         else:
             peer = self.transport._itr_sock.getpeername()[0]
@@ -88,19 +88,19 @@ class SwitchControllerService:
                     }
 
     async def press_controller_button(self, button: str):
-        if self.transport is None:
+        if not self.is_connected():
             return
         self.controller_state.button_state.set_button(button, pushed=True)
         await self.controller_state.send()
 
     async def release_controller_button(self, button: str):
-        if self.transport is None:
+        if not self.is_connected():
             return
         self.controller_state.button_state.set_button(button, pushed=False)
         await self.controller_state.send()
 
     async def set_stick_axis(self, stick: ControllerStick, axis: ControllerAxis, value: int):
-        if self.transport is None:
+        if not self.is_connected():
             return
         if stick == ControllerStick.l_stick:
             stick_to_change = self.controller_state.l_stick_state
@@ -113,7 +113,7 @@ class SwitchControllerService:
         await self.controller_state.send()
 
     async def center_stick(self, stick: ControllerStick):
-        if self.transport is None:
+        if not self.is_connected():
             return
         if stick == ControllerStick.l_stick:
             stick_to_change = self.controller_state.l_stick_state
@@ -123,11 +123,25 @@ class SwitchControllerService:
         await self.controller_state.send()
 
     async def set_nfc_data(self, nfc_data: bytes):
+        if not not self.is_connected():
+            return
+
         old_nfc = self.controller_state.get_nfc()
         if old_nfc is None and nfc_data is None:
             return
         self.controller_state.set_nfc(nfc_data)
         await self.controller_state.send()
+
+    def is_connected(self):
+        if self.transport is None:
+            return False
+
+        try:
+            self.transport._itr_sock.getpeername()[0]
+        except:
+            return False
+
+        return True
 
 def convertStickState(stick_state: StickState):
     if stick_state is None:
