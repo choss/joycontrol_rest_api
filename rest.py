@@ -86,4 +86,7 @@ async def startup():
     app.state.switch_controller = SwitchControllerService()
 
 if __name__ == "__main__":
-    uvicorn.run("rest:app", host="0.0.0.0", port=8000, log_level="info")
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
+    log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
+    uvicorn.run("rest:app", host="0.0.0.0", port=8000, log_level="info", log_config=log_config)
