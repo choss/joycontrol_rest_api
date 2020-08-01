@@ -1,11 +1,11 @@
 from enum import Enum
+import logging
 
 from joycontrol.controller import Controller
 from joycontrol.controller_state import ControllerState, StickState
 from joycontrol.memory import FlashMemory
 from joycontrol.protocol import ControllerProtocol
 from joycontrol.server import create_hid_server
-
 
 class ControllerStick(str, Enum):
     l_stick = "l_stick"
@@ -123,14 +123,14 @@ class SwitchControllerService:
         await self.controller_state.send()
 
     async def set_nfc_data(self, nfc_data: bytes):
-        if not not self.is_connected():
+        if not self.is_connected():
             return
 
         old_nfc = self.controller_state.get_nfc()
         if old_nfc is None and nfc_data is None:
             return
+
         self.controller_state.set_nfc(nfc_data)
-        await self.controller_state.send()
 
     def is_connected(self):
         if self.transport is None:
