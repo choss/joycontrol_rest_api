@@ -55,7 +55,8 @@ async def controller_status():
 @app.patch("/controller/button/tap/{button_name}")
 async def press_controller_button_for_300_ms(button_name: ControllerButton):
     await app.state.switch_controller.press_controller_button(button_name)
-    await asyncio.sleep(0.3)
+    # async waiting is a finicky, so we only wait 250ms
+    await asyncio.sleep(0.25)
     await app.state.switch_controller.release_controller_button(button_name)
     return await controller_status()
 
