@@ -2,6 +2,7 @@ import uvicorn
 import asyncio
 import base64
 from fastapi import FastAPI, Path
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from starlette.responses import RedirectResponse
 from rest_controller_service import ControllerAxis, SwitchControllerService
@@ -10,6 +11,17 @@ from rest_controller_service import ControllerStick
 
 app = FastAPI()
 
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class ConnectRequest(BaseModel):
     controller_type: str = Field("PRO_CONTROLLER", title="Type of controller to emulate [PRO_CONTROLLER, JOYCON_R, JOYCON_L]", example="PRO_CONTROLLER")
