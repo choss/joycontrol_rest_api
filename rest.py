@@ -16,6 +16,15 @@ class ConnectRequest(BaseModel):
     spi_firm: str = Field(None, title="Controller SPI Firm - base64 encoded", example="")
     reconnect_address: str = Field(None, title="MAC Address of switch - if empty a new pairing attempt will be done", example="E1:3F:54:0B:DE:BB")
 
+    class Config:
+        schema_extra = {
+            "example":
+                {
+                        "controller_type": "PRO_CONTROLLER",
+                        "reconnect_address": "E1:3F:54:0B:DE:BB"
+                }
+        }
+
 
 class NfcData(BaseModel):
     nfc_data: str = Field(None, title="NFC data - base64 encoded", example="")

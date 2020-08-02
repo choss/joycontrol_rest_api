@@ -34,7 +34,37 @@ The base64 encoded data for spi firmware or nfc data should not contain line bre
 base64 -w 0 spi_firm.bin > spi_firm_base64.txt
 ```
 
-## responses
+## Connection example jsons
+
+### Pair with a switch (be on the change grip/ order screen)
+
+```json
+{
+  "controller_type": "PRO_CONTROLLER"
+}
+```
+
+### Reconnect to an already paired switch
+
+In this example the MAC of the switch is E1:3F:54:0B:DE:BB
+
+```json
+{
+  "controller_type": "PRO_CONTROLLER",
+  "reconnect_address": "E1:3F:54:0B:DE:BB"
+}
+```
+
+### All connection attempts also (optionally) take a spi_firmware as base64 encoded string
+
+```json
+{
+  "controller_type": "PRO_CONTROLLER",
+  "spi_firm" : "<very long base64 encoded string>",
+}
+```
+
+## Responses
 
 The response of every API method is a status response like the one below.
 
