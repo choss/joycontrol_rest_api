@@ -11,8 +11,8 @@ This script also needs **root** to run, as it is a requirement of joycontrol
 In addition to the joycontrol packages you also need fastapi and uvicorn.
 
 ```bash
-sudo pip install fastapi
-sudo pip install uvicorn
+sudo pip3 install fastapi
+sudo pip3 install uvicorn
 ```
 
 # How to run
