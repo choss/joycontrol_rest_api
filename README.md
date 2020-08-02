@@ -26,6 +26,12 @@ export PYTHONPATH=./joycontrol
 sudo python3 rest.py
 ```
 
+To disable cors validation start with
+
+```bash
+sudo python3 rest.py nocors
+```
+
 # Rest api notes
 
 To see the api just run the script and navigate to <ip>:8000. The documentation will be shown

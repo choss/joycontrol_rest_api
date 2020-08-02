@@ -1,7 +1,9 @@
 import uvicorn
 import asyncio
 import base64
+import sys
 from fastapi import FastAPI, Path
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from starlette.responses import RedirectResponse
 from rest_controller_service import ControllerAxis, SwitchControllerService
@@ -103,6 +105,15 @@ async def startup():
     app.state.switch_controller = SwitchControllerService()
 
 if __name__ == "__main__":
+    if len(sys.argv) == 2 and sys.argv[0] == "nocors":
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
     log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
