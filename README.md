@@ -4,6 +4,7 @@ A rest client in python for joycontrol. Exposes the joycontrol pro-controller em
 
 This script also needs **root** to run, as it is a requirement of joycontrol
 
+This project is also used as the backend for https://github.com/choss/joycontrol-web-interface
 
 
 # Package requirements
