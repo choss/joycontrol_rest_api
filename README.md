@@ -26,10 +26,10 @@ export PYTHONPATH=./joycontrol
 sudo python3 rest.py
 ```
 
-To disable cors validation start with
+To disable cors validation create a file called _.env_ with the following content
 
 ```bash
-sudo python3 rest.py nocors
+ALLOW_ALL_CORS=True
 ```
 
 # Rest api notes
