@@ -118,7 +118,7 @@ The response of every API method is a status response like the one below.
 
 ```bash
 sudo apt install python3-dbus libhidapi-hidraw0
-sudo pip install hid aioconsole dbus-python crc8
+sudo pip3 install hid aioconsole dbus-python crc8
 ```
 
 In order to do that, change the following line in /lib/systemd/system/bluetooth.service from
